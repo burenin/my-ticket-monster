@@ -1,0 +1,14 @@
+/target/
+/log/
+/logs/
+/jforex-logs/
+/.settings/
+/.classpath
+/.project
+/*.iml
+/*.ipr
+/rc/javadocs/
+/rc/plugins/
+/.idea
+/classes
+nbactions.xml
