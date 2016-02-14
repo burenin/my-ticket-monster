@@ -12,3 +12,5 @@
 /.idea
 /classes
 nbactions.xml
+/bin/
+/.tern-project
