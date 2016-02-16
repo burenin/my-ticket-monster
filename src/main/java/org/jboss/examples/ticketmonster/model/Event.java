@@ -1,25 +1,39 @@
 package org.jboss.examples.ticketmonster.model;
 
-import javax.persistence.Entity;
 import java.io.Serializable;
-import javax.persistence.Id;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
-import javax.persistence.Column;
-import javax.persistence.Version;
+import javax.persistence.Id;
+import javax.persistence.ManyToOne;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
-import org.jboss.examples.ticketmonster.model.MediaItem;
-import javax.persistence.ManyToOne;
+
+
+/**
+* <p>
+* Represents an event, which may have multiple performances with different dates and venues.
+* </p>
+*
+* <p>
+* Event's principal members are it's relationship to {@link EventCategory} - specifying the
+type of event it is - and
+* {@link MediaItem} - providing the ability to add media (such as a picture) to the event
+for display. It also contains
+* meta-data about the event, such as it's name and a description.
+* </p>
+*
+*/
 @Entity
-public class Event implements Serializable {
+public class Event {
 	/* Declaration of fields */
 	/**
 	 * The synthetic ID of the object.
 	 */
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name = "id", updatable = false, nullable = false)
 	private Long id;
 
 	/**
@@ -71,8 +85,41 @@ public class Event implements Serializable {
 	@Size(min = 20, max = 1000, message = "An event's description must contain between 20 and 1000 characters")
 	private String description;
 
+	/**
+	 * <p>
+	 * A media item, such as an image, which can be used to entice a browser to book a ticket.
+	 * </p>
+	 *
+	 * <p>
+	 * Media items can be shared between events, so this is modeled as a
+	<code>@ManyToOne</code> relationship.
+	 * </p>
+	 *
+	 * <p>
+	 * Adding a media item is optional, and the view layer will adapt if none is provided.
+	 * </p>
+	 *
+	 */
 	@ManyToOne
 	private MediaItem mediaItem;
+
+	/**
+	* <p>
+	* The category of the event
+	* </p>
+	*
+	* <p>
+	* Event categories are used to ease searching of available of events, and hence this is
+	modeled as a relationship
+	* </p>
+	*
+	* <p>
+	* The Bean Validation constraint <code>@NotNull</code> indicates that the event
+	category must be specified.
+	*/
+	@ManyToOne
+	@NotNull
+	private EventCategory category;
 
 	public Long getId() {
 		return this.id;
@@ -99,11 +146,6 @@ public class Event implements Serializable {
 	public int hashCode() {
 		return name != null ? name.hashCode() : 0;
 	}
-	@Override
-	public String toString() {
-		return name;
-	}
-
 	public String getName() {
 		return name;
 	}
@@ -126,6 +168,24 @@ public class Event implements Serializable {
 
 	public void setMediaItem(final MediaItem mediaItem) {
 		this.mediaItem = mediaItem;
+	}
+
+	public EventCategory getCategory() {
+		return category;
+	}
+
+	public void setCategory(EventCategory category) {
+		this.category = category;
+	}
+
+	@Override
+	public String toString() {
+		String result = getClass().getSimpleName() + " ";
+		if (name != null && !name.trim().isEmpty())
+			result += "name: " + name;
+		if (description != null && !description.trim().isEmpty())
+			result += ", description: " + description;
+		return result;
 	}
 
 }
