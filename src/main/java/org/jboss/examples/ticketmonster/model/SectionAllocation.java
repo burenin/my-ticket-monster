@@ -37,6 +37,7 @@ import javax.validation.constraints.NotNull;
  * @author Marius Bogoevici
  * @author Pete Muir
  */
+@SuppressWarnings("serial")
 @Entity
 @Table(uniqueConstraints = @UniqueConstraint(columnNames = { "performance_id", "section_id" }))
 public class SectionAllocation implements Serializable {
@@ -61,7 +62,6 @@ public class SectionAllocation implements Serializable {
      * warnings the java compiler gives us about not using the field!
      * </p>
      */
-    @SuppressWarnings("unused")
     @Version
     private long version;
 

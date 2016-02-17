@@ -12,13 +12,14 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
-import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.ws.rs.core.MediaType;
+import javax.enterprise.context.RequestScoped;
 
 import org.jboss.examples.ticketmonster.model.MediaItem;
+import org.jboss.examples.ticketmonster.model.MediaType;
+import org.jboss.examples.ticketmonster.util.Base64;
 import org.jboss.examples.ticketmonster.util.Reflections;
 
 /**
@@ -38,6 +39,8 @@ import org.jboss.examples.ticketmonster.util.Reflections;
 * </p>
 *
 */
+
+@RequestScoped
 public class MediaManager {
 
 	/**
@@ -100,13 +103,13 @@ public class MediaManager {
 	private MediaPath createPath(MediaItem mediaItem) {
 		if(mediaItem == null) {
 			return
-					createCachedMedia(Reflections.getResource("not_available.jpg").toExternalForm(), IMAGE);
+					createCachedMedia(Reflections.getResource("not_available.jpg").toExternalForm(), MediaType.IMAGE);
 		} else if (!mediaItem.getMediaType().isCacheable()) {
 			if (checkResourceAvailable(mediaItem)) {
 				return new MediaPath(mediaItem.getUrl(), false, mediaItem.getMediaType());
 			} else {
 				return
-						createCachedMedia(Reflections.getResource("not_available.jpg").toExternalForm(), IMAGE);
+						createCachedMedia(Reflections.getResource("not_available.jpg").toExternalForm(), MediaType.IMAGE);
 			}
 		} else {
 			return createCachedMedia(mediaItem);
