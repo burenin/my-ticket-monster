@@ -14,6 +14,8 @@ import java.util.Date;
 import javax.persistence.Column;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+
+import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 import org.jboss.examples.ticketmonster.model.Show;
 import javax.persistence.ManyToOne;
 
@@ -31,6 +33,7 @@ import javax.persistence.ManyToOne;
 @SuppressWarnings("serial")
 @Entity
 @Table(uniqueConstraints = @UniqueConstraint(columnNames = {"date", "show_id"}))
+@JsonIgnoreProperties("show")
 public class Performance implements Serializable {
 	/* Declaration of fields */
 	/**

@@ -10,9 +10,8 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 import javax.validation.constraints.NotNull;
-import org.jboss.examples.ticketmonster.model.Section;
-import org.jboss.examples.ticketmonster.model.TicketCategory;
-import javax.persistence.Column;
+
+import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 
 /**
  * <p>
@@ -34,6 +33,7 @@ import javax.persistence.Column;
 @Entity
 @Table(uniqueConstraints = @UniqueConstraint(columnNames = {"section_id",
 		"show_id", "ticketcategory_id"}))
+@JsonIgnoreProperties("show")
 public class TicketPrice implements Serializable {
 	/* Declaration of fields */
 	/**

@@ -18,7 +18,11 @@ public class AllocatedSeats {
 		return sectionAllocation;
 	}
 
-	public List getSeats() {
+	public List<Seat> getSeats() {
 		return seats;
 	}
+	
+	public void markOccupied() {
+        sectionAllocation.markOccupied(seats);
+    }
 }
