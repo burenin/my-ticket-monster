@@ -138,6 +138,10 @@ public class Show {
 	public void setEvent(final Event event) {
 		this.event = event;
 	}
+	
+	public Event getEvent() {
+		return event;
+	}
 
 	public Venue getVenue() {
 		return this.venue;
