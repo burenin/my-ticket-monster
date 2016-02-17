@@ -14,8 +14,10 @@ import javax.inject.Inject;
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -28,6 +30,7 @@ import org.jboss.examples.ticketmonster.model.TicketCategory;
 import org.jboss.examples.ticketmonster.model.TicketPrice;
 import org.jboss.examples.ticketmonster.service.AllocatedSeats;
 import org.jboss.examples.ticketmonster.service.SeatAllocationService;
+import org.jboss.examples.ticketmonster.util.qualifier.Cancelled;
 import org.jboss.examples.ticketmonster.util.qualifier.Created;
 
 /**
@@ -52,6 +55,10 @@ public class BookingService extends BaseEntityService<Booking> {
 	@Created
 	private Event<Booking> newBookingEvent;
 
+	@Inject
+	@Cancelled
+	private Event<Booking> cancelledBookingEvent;
+
 	public BookingService() {
 		super(Booking.class);
 	}
@@ -71,9 +78,11 @@ public class BookingService extends BaseEntityService<Booking> {
 	public Response createBooking(BookingRequest bookingRequest) {
 		try {
 			// identify the ticket price categories in this request
-			Set<Long> priceCategoryIds = bookingRequest.getUniquePriceCategoryIds();
+			Set<Long> priceCategoryIds = bookingRequest
+					.getUniquePriceCategoryIds();
 			// load the entities that make up this booking's relationships
-			Performance performance = getEntityManager().find(Performance.class, bookingRequest.getPerformance());
+			Performance performance = getEntityManager().find(
+					Performance.class, bookingRequest.getPerformance());
 			// As we can have a mix of ticket types in a booking, we need to load all of them that are relevant,
 			// id
 			Map<Long, TicketPrice> ticketPricesById = loadTicketPrices(priceCategoryIds);
@@ -85,34 +94,43 @@ public class BookingService extends BaseEntityService<Booking> {
 			booking.setCancellationCode("abc");
 			// Now, we iterate over each ticket that was requested, and organize them by section and category
 			// we want to allocate ticket requests that belong to the same section contiguously
-			Map<Section, Map<TicketCategory, TicketRequest>> ticketRequestsPerSection = new TreeMap<>(SectionComparator.instance());
-			for (TicketRequest ticketRequest : bookingRequest.getTicketRequests()) {
-				final TicketPrice ticketPrice = ticketPricesById.get(ticketRequest.getTicketPrice());
-				if (!ticketRequestsPerSection.containsKey(ticketPrice.getSection())) {
-					ticketRequestsPerSection.put(ticketPrice.getSection(), new HashMap<>());
+			Map<Section, Map<TicketCategory, TicketRequest>> ticketRequestsPerSection = new TreeMap<>(
+					SectionComparator.instance());
+			for (TicketRequest ticketRequest : bookingRequest
+					.getTicketRequests()) {
+				final TicketPrice ticketPrice = ticketPricesById
+						.get(ticketRequest.getTicketPrice());
+				if (!ticketRequestsPerSection.containsKey(ticketPrice
+						.getSection())) {
+					ticketRequestsPerSection.put(ticketPrice.getSection(),
+							new HashMap<>());
 				}
 				ticketRequestsPerSection.get(ticketPrice.getSection()).put(
-						ticketPricesById.get(ticketRequest.getTicketPrice()).getTicketCategory(), ticketRequest);
+						ticketPricesById.get(ticketRequest.getTicketPrice())
+								.getTicketCategory(), ticketRequest);
 			}
 			// Now, we can allocate the tickets
 			// Iterate over the sections, finding the candidate seats for allocation
 			// The process will acquire a write lock for a given section and performance
 			// Use deterministic ordering of sections to prevent deadlocks
-			Map<Section, AllocatedSeats> seatsPerSection = new TreeMap<>(SectionComparator.instance());
+			Map<Section, AllocatedSeats> seatsPerSection = new TreeMap<>(
+					SectionComparator.instance());
 			List<Section> failedSections = new ArrayList<>();
 			for (Section section : ticketRequestsPerSection.keySet()) {
 				int totalTicketsRequestedPerSection = 0;
 				// Compute the total number of tickets required (a ticket category doesn't impact the actual seat!)
-				final Map<TicketCategory, TicketRequest> ticketRequestsByCategories =
-						ticketRequestsPerSection.get(section);
+				final Map<TicketCategory, TicketRequest> ticketRequestsByCategories = ticketRequestsPerSection
+						.get(section);
 				// calculate the total quantity of tickets to be allocated in this section
-				for (TicketRequest ticketRequest : ticketRequestsByCategories.values()) {
-					totalTicketsRequestedPerSection += ticketRequest.getQuantity();
+				for (TicketRequest ticketRequest : ticketRequestsByCategories
+						.values()) {
+					totalTicketsRequestedPerSection += ticketRequest
+							.getQuantity();
 				}
 				// try to allocate seats
-				AllocatedSeats allocatedSeats =
-						seatAllocationService.allocateSeats(section,
-								performance, totalTicketsRequestedPerSection, true);
+				AllocatedSeats allocatedSeats = seatAllocationService
+						.allocateSeats(section, performance,
+								totalTicketsRequestedPerSection, true);
 				if (allocatedSeats.getSeats().size() == totalTicketsRequestedPerSection) {
 					seatsPerSection.put(section, allocatedSeats);
 				} else {
@@ -123,22 +141,23 @@ public class BookingService extends BaseEntityService<Booking> {
 				for (Section section : seatsPerSection.keySet()) {
 					// allocation was successful, begin generating tickets
 					// associate each allocated seat with a ticket, assigning a price category to it
-					final Map<TicketCategory, TicketRequest> ticketRequestsByCategories =
-							ticketRequestsPerSection.get(section);
-					AllocatedSeats allocatedSeats = seatsPerSection.get(section);
+					final Map<TicketCategory, TicketRequest> ticketRequestsByCategories = ticketRequestsPerSection
+							.get(section);
+					AllocatedSeats allocatedSeats = seatsPerSection
+							.get(section);
 					allocatedSeats.markOccupied();
 					int seatCounter = 0;
 					// Now, add a ticket for each requested ticket to the booking
-					for (TicketCategory ticketCategory :
-						ticketRequestsByCategories.keySet()) {
-						final TicketRequest ticketRequest =
-								ticketRequestsByCategories.get(ticketCategory);
-						final TicketPrice ticketPrice =
-								ticketPricesById.get(ticketRequest.getTicketPrice());
+					for (TicketCategory ticketCategory : ticketRequestsByCategories
+							.keySet()) {
+						final TicketRequest ticketRequest = ticketRequestsByCategories
+								.get(ticketCategory);
+						final TicketPrice ticketPrice = ticketPricesById
+								.get(ticketRequest.getTicketPrice());
 						for (int i = 0; i < ticketRequest.getQuantity(); i++) {
-							Ticket ticket =
-									new Ticket(allocatedSeats.getSeats().get(seatCounter + i), ticketCategory,
-											ticketPrice.getPrice());
+							Ticket ticket = new Ticket(allocatedSeats
+									.getSeats().get(seatCounter + i),
+									ticketCategory, ticketPrice.getPrice());
 							// getEntityManager().persist(ticket);
 							booking.getTickets().add(ticket);
 						}
@@ -150,36 +169,61 @@ public class BookingService extends BaseEntityService<Booking> {
 				booking.setCancellationCode("abc");
 				getEntityManager().persist(booking);
 				newBookingEvent.fire(booking);
-				return
-						Response.ok().entity(booking).type(MediaType.APPLICATION_JSON_TYPE).build();
+				return Response.ok().entity(booking)
+						.type(MediaType.APPLICATION_JSON_TYPE).build();
 			} else {
 				Map<String, Object> responseEntity = new HashMap<String, Object>();
-				responseEntity.put("errors", Collections.singletonList("Cannot allocate the requested number of seats!"));
-				return
-						Response.status(Response.Status.BAD_REQUEST).entity(responseEntity).build();
+				responseEntity
+						.put("errors",
+								Collections
+										.singletonList("Cannot allocate the requested number of seats!"));
+				return Response.status(Response.Status.BAD_REQUEST)
+						.entity(responseEntity).build();
 			}
 		} catch (ConstraintViolationException e) {
 			// If validation of the data failed using Bean Validation, then send an error
 			Map<String, Object> errors = new HashMap<String, Object>();
 			List<String> errorMessages = new ArrayList<String>();
-			for (ConstraintViolation<?> constraintViolation : e.getConstraintViolations()) {
+			for (ConstraintViolation<?> constraintViolation : e
+					.getConstraintViolations()) {
 				errorMessages.add(constraintViolation.getMessage());
 			}
 			errors.put("errors", errorMessages);
 			// A WebApplicationException can wrap a response
 			// Throwing the exception causes an automatic rollback
-			throw new WebApplicationException(Response.status(Response.Status.BAD_REQUEST).entity(errors).build());
+			throw new WebApplicationException(Response
+					.status(Response.Status.BAD_REQUEST).entity(errors).build());
 		} catch (Exception e) {
 			// Finally, handle unexpected exceptions
 			Map<String, Object> errors = new HashMap<String, Object>();
 			errors.put("errors", Collections.singletonList(e.getMessage()));
 			// A WebApplicationException can wrap a response
 			// Throwing the exception causes an automatic rollback
-			throw new WebApplicationException(Response.status(Response.Status.BAD_REQUEST).entity(errors).build());
+			throw new WebApplicationException(Response
+					.status(Response.Status.BAD_REQUEST).entity(errors).build());
 		}
 	}
 	
 	
+	/**
+	* <p>
+	* Delete a booking by id
+	* </p>
+	* @param id
+	* @return
+	*/
+	@DELETE
+	@Path("/{id:[0-9][0-9]*}")
+	public Response deleteBooking(@PathParam("id") Long id) {
+		Booking booking = getEntityManager().find(Booking.class, id);
+		if (booking == null) {
+			return Response.status(Response.Status.NOT_FOUND).build();
+		}
+		getEntityManager().remove(booking);
+		cancelledBookingEvent.fire(booking);
+		return Response.noContent().build();
+	}
+
 	/**
 	 * Utility method for loading ticket prices
 	 * @param priceCategoryIds
