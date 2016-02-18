@@ -142,7 +142,7 @@ public abstract class BaseEntityService<T> {
 		return entityManager.createQuery(criteriaQuery).getSingleResult();
 	}
 
-	private List<T> getAll(MultivaluedMap<String, String> queryParameters) {
+	public List<T> getAll(MultivaluedMap<String, String> queryParameters) {
 		final CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
 		final CriteriaQuery<T> criteriaQuery = criteriaBuilder.createQuery(entityClass);
 		Root<T> root = criteriaQuery.from(entityClass);
