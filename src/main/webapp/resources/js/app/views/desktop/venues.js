@@ -1,24 +1,22 @@
 define([
     'utilities',
     'bootstrap',
-    'text!../../../../templates/desktop/events.html'
+    'text!../../../../templates/desktop/venues.html'
 ], function (
     utilities,
     bootstrap,
-    eventsTemplate) {
+    venuesTemplate) {
 
     var EventsView = Backbone.View.extend({
         events:{
             "click a":"update"
         },
         render:function () {
-            var categories = _.uniq(
+            var cities = _.uniq(
                 _.map(this.model.models, function(model){
-                    return model.get('category')
-                }), false, function(item){
-                    return item.id
-                });
-            utilities.applyTemplate($(this.el), eventsTemplate, {categories:categories, model:this.model})
+                    return model.get('address').city
+                }));
+            utilities.applyTemplate($(this.el), venuesTemplate, {cities: cities, model:this.model});
             $(this.el).find('.item:first').addClass('active');
             $(".carousel").carousel();
             $("a[rel='popover']").popover({trigger:'hover',container:'#content'});
