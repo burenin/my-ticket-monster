@@ -31,9 +31,9 @@ JAX-RS is a new specification in Java EE 6. It allows application developers to 
 </intro>
   <item
         skip="false"
-        title="The my-ticket-moster example in depth">
+        title="The my-ticket-monster example in depth">
      <description>
-       The my-ticket-moster application shows off a number of Java EE technologies such as CDI, JSF, EJB, JTA, JAX-RS and Arquillian. 
+       The my-ticket-monster application shows off a number of Java EE technologies such as CDI, JSF, EJB, JTA, JAX-RS and Arquillian. 
        It does this by providing a member registration database, available via JSF and JAX-RS.
 <br/><br/>
 As usual, let&apos;s start by looking at the necessary deployment descriptors. 
@@ -395,7 +395,7 @@ We discussed both of these files in detail in The <b>greeter example in depth</b
         skip="true"
         title="JAX-RS">
      <description>
-       Before we wrap up our tour of the my-ticket-moster example application, 
+       Before we wrap up our tour of the my-ticket-monster example application, 
        let&apos;s take a look at how the JAX-RS endpoints are created. Firstly, {<b>JaxRSActivator</b>}}, 
        which extends <b>Application</b> and is annotated with <b>@ApplicationPath</b>, 
        is the Java EE 6 <b>no XML</b> approach to activating JAX-RS.
@@ -694,7 +694,7 @@ We discussed both of these files in detail in The <b>greeter example in depth</b
       <br/><br/>
       In order to perform that, you should select <b>Help&gt;JBoss Central</b> and click the <b>Java EE Web Project</b> wizard.
       <br/>
-      You will get a brand new project with the same functionality as <b>my-ticket-moster</b>, 
+      You will get a brand new project with the same functionality as <b>my-ticket-monster</b>, 
       but customized with your details.
     </description>
   </item>

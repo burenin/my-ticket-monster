@@ -1,4 +1,4 @@
-my-ticket-moster: Assortment of technologies including Arquillian
+my-ticket-monster: Assortment of technologies including Arquillian
 ========================
 Author: Pete Muir  
 Level: Intermediate  
@@ -15,7 +15,7 @@ This is your project! It is a sample, deployable Maven 3 project to help you get
 
 This project is setup to allow you to create a compliant Java EE 6 application using JSF 2.0, CDI 1.0, EJB 3.1, JPA 2.0 and Bean Validation 1.0. It includes a persistence unit and some sample persistence and transaction code to introduce you to database access in enterprise Java. 
 
-There is a tutorial for this quickstart in the [Getting Started Developing Applications Guide](http://www.jboss.org/jdf/quickstarts/jboss-as-quickstart/guide/my-ticket-moster/).
+There is a tutorial for this quickstart in the [Getting Started Developing Applications Guide](http://www.jboss.org/jdf/quickstarts/jboss-as-quickstart/guide/my-ticket-monster/).
 
 System requirements
 -------------------
@@ -53,13 +53,13 @@ _NOTE: The following build command assumes you have configured your Maven user s
 
         mvn clean install jboss-as:deploy
 
-4. This will deploy `target/my-ticket-moster.war` to the running instance of the server.
+4. This will deploy `target/my-ticket-monster.war` to the running instance of the server.
  
 
 Access the application 
 ---------------------
 
-The application will be running at the following URL: <http://localhost:8080/my-ticket-moster/>.
+The application will be running at the following URL: <http://localhost:8080/my-ticket-monster/>.
 
 
 Undeploy the Archive

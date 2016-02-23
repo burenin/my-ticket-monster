@@ -23,10 +23,10 @@
    xsi:schemaLocation="http://www.jboss.org/ironjacamar/schema http://docs.jboss.org/ironjacamar/schema/datasources_1_0.xsd">
    <!-- The datasource is bound into JNDI at this location. We reference 
       this in META-INF/test-persistence.xml -->
-   <datasource jndi-name="java:jboss/datasources/my-ticket-mosterTestDS"
-      pool-name="my-ticket-moster-test" enabled="true"
+   <datasource jndi-name="java:jboss/datasources/my-ticket-monsterTestDS"
+      pool-name="my-ticket-monster-test" enabled="true"
       use-java-context="true">
-      <connection-url>jdbc:h2:mem:my-ticket-moster-test;DB_CLOSE_DELAY=-1</connection-url>
+      <connection-url>jdbc:h2:mem:my-ticket-monster-test;DB_CLOSE_DELAY=-1</connection-url>
       <driver>h2</driver>
       <security>
          <user-name>sa</user-name>
