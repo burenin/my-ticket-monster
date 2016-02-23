@@ -55,7 +55,7 @@ define([
 							|| value <= 0 // is negative
 							|| parseFloat(value) != parseInt(value))) { // is not an integer
 				$("#error-input-"+ticketPriceId).empty().append("Please enter a positive integer value");
-						$("#ticket-category-fieldset-"+ticketPriceId).addClass("error");
+				$("#ticket-category-fieldset-"+ticketPriceId).addClass("error");
 			} else {
 				$("#error-input-"+ticketPriceId).empty();
 				$("#ticket-category-fieldset-"+ticketPriceId).removeClass("error");
