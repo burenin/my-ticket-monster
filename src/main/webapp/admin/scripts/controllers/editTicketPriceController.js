@@ -16,7 +16,7 @@ angular.module('myticketmonster').controller('EditTicketPriceController', functi
                     };
                     var labelObject = {
                         value : item.id,
-                        text : item.id
+                        text : item.displayTitle
                     };
                     if($scope.ticketPrice.show && item.id == $scope.ticketPrice.show.id) {
                         $scope.showSelection = labelObject;

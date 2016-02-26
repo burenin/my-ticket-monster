@@ -3,6 +3,7 @@ package org.jboss.examples.ticketmonster.test.rest;
 
 import org.jboss.examples.ticketmonster.model.Booking;
 import org.jboss.examples.ticketmonster.rest.BaseEntityService;
+import org.jboss.examples.ticketmonster.rest.dto.VenueDTO;
 import org.jboss.examples.ticketmonster.service.SeatAllocationService;
 import org.jboss.examples.ticketmonster.test.TicketMonsterDeployment;
 import org.jboss.examples.ticketmonster.util.MultivaluedHashMap;
@@ -15,6 +16,7 @@ public class RESTDeployment {
 				.addPackage(Booking.class.getPackage())
 				.addPackage(BaseEntityService.class.getPackage())
 				.addPackage(MultivaluedHashMap.class.getPackage())
-				.addPackage(SeatAllocationService.class.getPackage());
+				.addPackage(SeatAllocationService.class.getPackage())
+				.addPackage(VenueDTO.class.getPackage());
 	}
 }
